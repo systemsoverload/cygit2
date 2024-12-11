@@ -9,6 +9,7 @@ from ._signature cimport Signature
 from ._reference cimport Reference
 from ._index cimport Index
 from ._oid cimport Oid, hex_to_oid
+from ._tree cimport Tree
 
 # Status constants
 STATUS_CURRENT = 0
@@ -304,6 +305,9 @@ cdef class Repository:
             raise GitError(err)
 
         try:
-            return Signature._from_c(sig)
+            # Create a new Signature object and transfer ownership
+            result = Signature._from_c(sig)
+            return result
         finally:
-            git_signature_free(sig)
+            if sig != NULL:
+                git_signature_free(sig)

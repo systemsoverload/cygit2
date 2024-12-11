@@ -2,6 +2,9 @@ from libc.stdint cimport uint32_t, int32_t, int64_t
 from libc.stdlib cimport malloc, free
 from cpython cimport PyObject
 from cpython.bytes cimport PyBytes_FromString
+
+
+from ._oid cimport git_oid
 from ._reference cimport Reference
 from ._index cimport Index
 from ._commit cimport Commit
@@ -22,6 +25,39 @@ cdef extern from "git2.h":
     ctypedef struct git_status_options
     ctypedef struct git_status_list
     ctypedef struct git_clone_options
+
+    # Type definitions and functions for commits
+    const git_oid* git_commit_id(const git_commit *commit)
+    int git_commit_create(
+        git_oid *id,
+        git_repository *repo,
+        const char *update_ref,
+        const git_signature *author,
+        const git_signature *committer,
+        const char *message_encoding,
+        const char *message,
+        const git_tree *tree,
+        size_t parent_count,
+        const git_commit **parents
+    )
+
+    int git_commit_lookup(git_commit **commit, git_repository *repo, const git_oid *id)
+    void git_commit_free(git_commit *commit)
+
+    # Functions for signatures
+    int git_signature_default(git_signature **out, git_repository *repo)
+    void git_signature_free(git_signature *sig)
+
+    # Functions for references
+    int git_reference_create(
+        git_reference **out,
+        git_repository *repo,
+        const char *name,
+        const git_oid *id,
+        int force,
+        const char *log_message,
+        const git_signature *signature
+    )
 
     # Time related structures
     ctypedef struct git_time:

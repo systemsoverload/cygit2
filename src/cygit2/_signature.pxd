@@ -1,6 +1,9 @@
 from libc.time cimport time_t
+from ._repository cimport git_repository
 
 cdef extern from "git2.h":
+    ctypedef struct git_repository
+
     ctypedef struct git_time:
         time_t time
         int offset
